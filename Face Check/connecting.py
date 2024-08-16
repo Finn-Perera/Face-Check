@@ -32,7 +32,7 @@ def writeItem():
             cursor.execute(sql_insert_query, values)
 
             print("Changes have been made: ")
-            cursor.execute("SELECT * FROM item")
+            cursor.execute("SELECT * FROM items")
             rows = cursor.fetchall()
             for item in rows:
                 print(item)
@@ -71,7 +71,7 @@ def read():
             print("Successfully connected to the databases")
             
             cursor = connection.cursor()
-            cursor.execute("SELECT * FROM item")
+            cursor.execute("SELECT * FROM items")
             for row in cursor.fetchall():
                 print(row)
     except Error as e:
@@ -83,6 +83,6 @@ def read():
             print("Connection closed")
 
 
-writeItem()
+#writeItem()
 
 read()

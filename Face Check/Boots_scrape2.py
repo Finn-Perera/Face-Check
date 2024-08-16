@@ -1,7 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait 
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as EC7
+import mysql.connector
+from mysql.connector import Error
+
 
 options = webdriver.ChromeOptions() 
 options.add_argument("--headless") # set headless mode
@@ -63,3 +66,5 @@ except Exception as e:
 
 # Close the WebDriver
 driver.quit()
+
+
