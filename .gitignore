@@ -1,0 +1,56 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment directory
+venv/
+env/
+ENV/
+
+# Dependency directories
+Pipfile.lock
+pip-wheel-metadata/
+
+# IDE and editor directories
+.vscode/
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Environment configuration files
+.env
+
+# Logs
+*.log
+
+# Test and coverage reports
+*.coverage
+*.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Static analysis
+.mypy_cache/
+.pytype/
+.dmypy.json
+.pyre/
+
+# Sphinx documentation
+docs/_build/
+
+# pytest cache
+.cache/
+
+# Local environment settings
+*.local
+
+# Git configurations
+.git/config
