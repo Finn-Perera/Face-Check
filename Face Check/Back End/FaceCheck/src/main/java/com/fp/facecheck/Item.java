@@ -1,31 +1,52 @@
 package com.fp.facecheck;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name="Items")
+@JsonPropertyOrder({"id", "itemName", "price", "rating","numReviews","href","website"})
 public class Item {
-    private String name;
-    private int price;
-    private int rating;
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private int id;
+    private String itemName;
+    private double price;
+    private double rating;
     private int numReviews;
-    private String referenceLink;
+    private String href;
     private String website;
 
-    public Item(String name, int price, int rating, int numReviews, String referenceLink, String website) {
-        this.name = name;
+    public Item(String itemName, double price, double rating, int numReviews, String href, String website) {
+        this.itemName = itemName;
         this.price = price;
         this.rating = rating;
         this.numReviews = numReviews;
-        this.referenceLink = referenceLink;
+        this.href = href;
         this.website = website;
     }
 
+    public Item() {
+
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Item[id=%d, name='%s', price=£%f, rating=%f, reviews=%d, website=%s]\n references=%s",
+                id, itemName, price, rating, numReviews, website, href
+        );
+    }
+
     public String getName() {
-        return name;
+        return itemName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.itemName = name;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -33,7 +54,7 @@ public class Item {
         this.price = price;
     }
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 
@@ -50,11 +71,11 @@ public class Item {
     }
 
     public String getReferenceLink() {
-        return referenceLink;
+        return href;
     }
 
     public void setReferenceLink(String referenceLink) {
-        this.referenceLink = referenceLink;
+        this.href = referenceLink;
     }
 
     public String getWebsite() {

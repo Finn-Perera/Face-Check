@@ -50,7 +50,7 @@ def writeItemsToDB():
                 return
             # name, price, stars, review_count, href, website
             sql_insert_query = """
-            INSERT INTO items (ItemName, Price, Rating, NumReviews, HREF, Website)
+            INSERT INTO items (item_name, price, rating, num_reviews, href, website)
             VALUES (%s, %s, %s, %s, %s, %s)
             """
             for item in items:
@@ -86,7 +86,7 @@ def writeItem():
 
             cursor = connection.cursor()
             sql_insert_query = """
-            INSERT INTO items (ItemName, Price, Rating, NumReviews, HREF, Website)
+            INSERT INTO items (item_name, price, rating, num_reviews, href, website)
             VALUES (%s, %s, %s, %s, %s, %s)
             """
             values = ("facewash", 5.10, 4.5, 10, "https://www.boots.com/the-ordinary-niacinamide-10-zinc-1-10267783", "Boots")
