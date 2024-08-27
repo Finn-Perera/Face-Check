@@ -1,14 +1,27 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait 
-from selenium.webdriver.support import expected_conditions as EC7
+from selenium.webdriver.support import expected_conditions as EC
 import mysql.connector
 from mysql.connector import Error
+import requests
 
 # How to do searching
 #search_box = driver.find_element(By.CSS_SELECTOR, "input.cdx-text-input__input") 
 #search_box.click() 
 #search_box.send_keys("CSS Baltic")
+
+#def get_img(component):
+    
+            # if img_url.startswith('data:image'):
+            #     return img_url
+            # else:
+            #     try :
+            #         img_data = requests.get(img_url).content
+            #     except Exception as e:
+            #         print("Error occured gathering img data: ", e)
+
+            # return img_data
 
 def gather_items():
     options = webdriver.ChromeOptions() 
@@ -33,16 +46,26 @@ def gather_items():
 
         print("All children found:")
 
-        # Find all <p> and <a> elements that are descendants of the first child (nested elements included)
+        # Find all <p>, <a>, <h3>, <img> elements that are descendants of the first child (nested elements included)
         for element in filtered_children:
             name = ""
             stars = 0
             reviewNum = 0
             hrefs = []
             text = []
-            paragraphs_and_links = element.find_elements(By.XPATH, './/p | .//a | .//h3')
+
+            driver.execute_script("arguments[0].scrollIntoView(true);", element)
+
+
+            paragraphs_and_links = element.find_elements(By.XPATH, './/p | .//a | .//h3 |.//img')
             for component in paragraphs_and_links:
                 #print(f"\nTag: {component.tag_name}")
+                if component.tag_name == "img" :
+                    temp_src = component.get_attribute('src')
+                    if temp_src.startswith('data:image/svg+xml;base64,'):
+                        continue
+                    image_data = temp_src
+
                 if component.tag_name == "h3" :
                     name = component.text
                 elif component.text != None:
@@ -62,14 +85,16 @@ def gather_items():
                     
                     value = component.get_attribute(attribute)
                     #print(f"{attribute}: {value}")
-            price = text[2]
-            price = price[1:]
+            price = text[2] # select price str
+            price = price[1:] # strip £
             link = hrefs[0]
             name = name.strip()
             # ['No7 Future Renew Day Cream SPF40 50ml', '(1165)', '£34.95', '50ML | £69.90 per 100ML', '', '', '', '']
             # ['No7 HydraLuminous+ Day Gel 50ml', '(57)', '£14.36', 'Save £3.59', 'Was £17.95', '50ML | £28.72 per 100ML', '', '', '', '']
             # Can also use text here to find discounts and price per unit?
-            items.append((name, price, stars, reviewNum, link, "Boots"))
+            #print(image_data)
+            items.append((name, price, stars, reviewNum, link, image_data, "Boots"))
+            
             #print(f"{name}\nstars: {stars} reviews {reviewNum}\nprice: {price}\nhref: {link}\n")
     except Exception as e:
         print("An error occurred:", e)

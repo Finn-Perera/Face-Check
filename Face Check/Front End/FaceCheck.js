@@ -8,7 +8,7 @@ function addItem() {
 
 const itemsButton = document.getElementById('items-button');
 itemsButton.addEventListener('click', () => {
-    itemsContainer = document.getElementById('items');
+    itemsContainer = document.getElementById('items-section');
     computedStyle = window.getComputedStyle(itemsContainer);
 
     if (computedStyle.contentVisibility === 'hidden') {
@@ -43,13 +43,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const listOfItemsDoc = document.getElementById('items')
-            console.log(items[0])
             items.forEach(element => {
                 var item = document.createElement('div');
                 item.classList.add('item');
                 
                 nameOfProd = document.createElement('h4');
                 nameOfProd.textContent = element.name;
+                
+                
+                imageOfProd = document.createElement('img');
+                imageOfProd.src = element.imageUrl;
+                imageOfProd.classList.add('item-image');
+                imageOfProd.alt="Description";
+
+                imageWrapper = document.createElement('a');
+                imageWrapper.classList.add('item-image-wrapper');
+                imageWrapper.appendChild(imageOfProd);
                 
                 cost = document.createElement('h5');
                 cost.textContent = "£" + element.price.toFixed(2); // rudimentary, only uk?
@@ -65,21 +74,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 review.appendChild(reviewNum);
 
                 //refLink = document.createElement('a');
-                nameOfProd.href = element.referenceLink;
-                nameOfProd.target = '_blank';
-                nameOfProd.rel = 'noopener noreferrer';
+                imageWrapper.href = element.referenceLink;
+                imageWrapper.target = '_blank';
+                imageWrapper.rel = 'noopener noreferrer';
                 //refLink.textContent = element.referenceLink;
 
                 websiteOrigin = document.createElement('h6');
                 websiteOrigin.textContent = element.website;
-                //const name = element[0];
-                //const numReviews = element[1];
-                //const price = element[2];
-                //const rating = element[3];
-                //const href = element[4];
-                //const website = element[5];
                 
                 item.appendChild(nameOfProd);
+                item.appendChild(imageWrapper);
                 item.appendChild(cost);
                 item.appendChild(review);
                 //item.appendChild(refLink);

@@ -10,10 +10,23 @@
     <div class="topnav">
         <a id="logo" class="nav-item"></a>
         <nav class="topnav-btn-display-items" role="button", id="items-button">Items</nav>
-    </div>  
-    <div class="item-section">
-        <div id="items" class="item-container"></div> 
     </div>
+    
+    <section>
+        <div class="light-gray">
+            <div class="category-selector"></div> <!-- have some kind of large section to allow space-->
+        </div>
+    </section>    
+    <section id="items-section"> <!-- this wont work, needs to be parent that hides-->
+        <div class="light-green">
+            <div class="item-section-title light-green">
+                <span> Items Available</span>
+            </div>
+            <div>
+                <div id="items" class="item-container"></div> 
+            </div>
+        </div>
+    </section>
     <script src="FaceCheck.js"></script>
 </body>
 </html>
