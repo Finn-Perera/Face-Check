@@ -92,8 +92,8 @@ def gather_items():
             # ['No7 Future Renew Day Cream SPF40 50ml', '(1165)', '£34.95', '50ML | £69.90 per 100ML', '', '', '', '']
             # ['No7 HydraLuminous+ Day Gel 50ml', '(57)', '£14.36', 'Save £3.59', 'Was £17.95', '50ML | £28.72 per 100ML', '', '', '', '']
             # Can also use text here to find discounts and price per unit?
-            #print(image_data)
-            items.append((name, price, stars, reviewNum, link, image_data, "Boots"))
+            
+            items.append((name, price, stars, reviewNum, link, "Boots", image_data))
             
             #print(f"{name}\nstars: {stars} reviews {reviewNum}\nprice: {price}\nhref: {link}\n")
     except Exception as e:
