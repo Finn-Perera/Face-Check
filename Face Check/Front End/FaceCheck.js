@@ -1,97 +1,207 @@
-function addItem() {
-    const itemList = document.getElementById('items');
-    const newItem = document.createElement('i');
-    newItem.textContent = 'an item';
-    newItem.classList.add('item')
-    itemList.appendChild(newItem);
-}
+let currentActive = null;
 
-const itemsButton = document.getElementById('items-button');
-itemsButton.addEventListener('click', () => {
-    itemsContainer = document.getElementById('items-section');
-    computedStyle = window.getComputedStyle(itemsContainer);
-
-    if (computedStyle.contentVisibility === 'hidden') {
-        itemsContainer.style.contentVisibility = 'auto';
-    } else {
-        itemsContainer.style.contentVisibility = 'hidden';
-    }
-});
-
-// document.addEventListener('DOMContentLoaded', function() {
-//     const button = document.getElementById('addItemButton');
-//     button.addEventListener('click', addItem);
-// });
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost:8080/')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(items => {
-            console.log(items);
-            if (!items.status === 'success') { // theres no status in my json this useless.
-                throw new Error('Error getting data')
-            }
-            //console.log(data.name)
-            console.log(items[0])
-            if (Array.isArray(items)) {
-                console.log('this works');
-            }
-
-            const listOfItemsDoc = document.getElementById('items')
-            items.forEach(element => {
-                var item = document.createElement('div');
-                item.classList.add('item');
-                
-                nameOfProd = document.createElement('h4');
-                nameOfProd.textContent = element.name;
-                
-                
-                imageOfProd = document.createElement('img');
-                imageOfProd.src = element.imageUrl;
-                imageOfProd.classList.add('item-image');
-                imageOfProd.alt="Description";
-
-                imageWrapper = document.createElement('a');
-                imageWrapper.classList.add('item-image-wrapper');
-                imageWrapper.appendChild(imageOfProd);
-                
-                cost = document.createElement('h5');
-                cost.textContent = "£" + element.price.toFixed(2); // rudimentary, only uk?
-
-                review = document.createElement('div');
-                review.classList.add('review');
-                // these shouldnt be div but not sure what it should be yet
-                reviewRating = document.createElement('div'); 
-                reviewNum = document.createElement('div')
-                reviewRating.textContent = element.rating + "★";
-                reviewNum.textContent = element.numReviews + " Reviews";
-                review.appendChild(reviewRating);
-                review.appendChild(reviewNum);
-
-                //refLink = document.createElement('a');
-                imageWrapper.href = element.referenceLink;
-                imageWrapper.target = '_blank';
-                imageWrapper.rel = 'noopener noreferrer';
-                //refLink.textContent = element.referenceLink;
-
-                websiteOrigin = document.createElement('h6');
-                websiteOrigin.textContent = element.website;
-                
-                item.appendChild(nameOfProd);
-                item.appendChild(imageWrapper);
-                item.appendChild(cost);
-                item.appendChild(review);
-                //item.appendChild(refLink);
-                item.appendChild(websiteOrigin);
-
-                listOfItemsDoc.appendChild(item);
-            });
-        })
-        .catch(error => console.error('Error fetching items: ', error));
-
+    createProducts();
 });
+
+function collapseActive() {
+    currentActive.querySelector('.extra-info').style.display = 'none';
+    currentActive.classList.remove('active');
+    currentActive = null;
+}
+// maybe display with 'greatest value' aka largest difference between low cost and average
+
+function createProducts() {
+    fetch('http://localhost:8080/products')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        //console.log(response)
+        return response.json();
+    })
+    .then(products => {
+        console.log(products);
+
+        console.log(products[0])
+
+        const listOfItemsDoc = document.getElementById('items')
+        products.forEach(element => {
+            
+            var product = document.createElement('div');
+            product.classList.add('item');
+            product.setAttribute('product_id', element.productId)
+
+            nameOfProd = document.createElement('h4');
+            nameOfProd.textContent = element.productName;
+
+            imgOfProd = document.createElement('img');
+            imgOfProd.src = element.productImage;
+            imgOfProd.classList.add('item-image');
+            imgOfProd.alt = "Description"; // change this
+
+            itemDataWrapper = document.createElement('div');
+            itemDataWrapper.classList.add('item-data-wrapper');
+            
+            imageWrapper = document.createElement('div');
+            imageWrapper.classList.add('item-image-wrapper');
+            
+            //product.classList.add('active')
+            extraInfo = document.createElement('div');
+            extraInfo.classList.add('extra-info');
+            extraInfo.style.display = 'none';
+
+            optionsWrapper = document.createElement('div');
+            optionsWrapper.classList.add('options-wrapper');
+            extraInfo.appendChild(optionsWrapper);
+            
+            imageWrapper.appendChild(imgOfProd);
+            itemDataWrapper.appendChild(imageWrapper);
+            itemDataWrapper.appendChild(extraInfo);
+            product.appendChild(nameOfProd);
+            product.appendChild(itemDataWrapper);
+            listOfItemsDoc.appendChild(product);
+        });
+
+        attachEventListeners();
+        /*items.forEach(element => {
+            var item = document.createElement('div');
+            item.classList.add('item');
+            
+            nameOfProd = document.createElement('h4');
+            nameOfProd.textContent = element.name;
+            
+            
+            imageOfProd = document.createElement('img');
+            imageOfProd.src = element.imageUrl;
+            imageOfProd.classList.add('item-image');
+            imageOfProd.alt="Description";
+
+            imageWrapper = document.createElement('a');
+            imageWrapper.classList.add('item-image-wrapper');
+            imageWrapper.appendChild(imageOfProd);
+            
+            cost = document.createElement('h5');
+            cost.textContent = "£" + element.price.toFixed(2); // rudimentary, only uk?
+
+            review = document.createElement('div');
+            review.classList.add('review');
+            // these shouldnt be div but not sure what it should be yet
+            reviewRating = document.createElement('div'); 
+            reviewNum = document.createElement('div')
+            reviewRating.textContent = element.rating + "★";
+            reviewNum.textContent = element.numReviews + " Reviews";
+            review.appendChild(reviewRating);
+            review.appendChild(reviewNum);
+
+            //refLink = document.createElement('a');
+            imageWrapper.href = element.referenceLink;
+            imageWrapper.target = '_blank';
+            imageWrapper.rel = 'noopener noreferrer';
+            //refLink.textContent = element.referenceLink;
+
+            websiteOrigin = document.createElement('h6');
+            websiteOrigin.textContent = element.website;
+            
+            item.appendChild(nameOfProd);
+            item.appendChild(imageWrapper);
+            item.appendChild(cost);
+            item.appendChild(review);
+            //item.appendChild(refLink);
+            item.appendChild(websiteOrigin);
+
+            listOfItemsDoc.appendChild(item);
+        });*/
+    })
+    .catch(error => console.error('Error fetching items: ', error));
+}
+
+// whenever you call you should check that the element doesnt already have the info
+function fetchExtraInfo(prodId, optionsWrapperElement) {
+    fetch(`http://localhost:8080/products/${prodId}/options`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(options => {
+        options.forEach(option => {
+            console.log(option);
+            optionElement = document.createElement('div');
+            optionElement.classList.add('option-element');
+
+            optionWebsite = document.createElement('p');
+            optionPriceWrap = document.createElement('a'); // maybe wrap this in a div,discount colors?
+            optionRating = document.createElement('div');
+            
+            price = option.price;
+            price = parseFloat(price).toFixed(2)
+            optionPriceWrap.textContent = `£${price}`;
+            optionPriceWrap.classList.add('no-style-link');
+            optionPriceWrap.classList.add('price-wrap');
+
+            rating = option.rating;
+            numReviews = option.numReviews;
+            optionRating.textContent = `${rating} Stars out of 5, ${numReviews} reviews`
+            optionWebsite.textContent = option.website;
+            
+            // add in last updated?
+            hrefLink = option.href;
+            optionPriceWrap.href = hrefLink;
+            optionPriceWrap.target = '_blank';
+
+            
+            optionElement.appendChild(optionWebsite);
+            optionElement.appendChild(optionRating);
+            optionElement.appendChild(optionPriceWrap);
+            optionsWrapperElement.appendChild(optionElement);
+        })
+    })
+    .catch(error => console.error('Error fetching extra information: ', error));
+}
+
+function attachEventListeners() {
+    // likely can be done on creation?
+    document.querySelectorAll(".item").forEach(product => {
+        product.addEventListener('click', function(event) {
+            event.stopPropagation()
+            this.classList.toggle('active');
+            const extraInfo = this.querySelector('.extra-info');
+            const isActive = this.classList.contains('active');
+    
+            if (extraInfo.style.display === 'block') {
+                extraInfo.style.display = 'none';
+            } else {
+                extraInfo.style.display = 'block';
+            }
+
+            if (currentActive && currentActive != this) {
+                collapseActive();
+            }
+            
+            currentActive = this.classList.contains('active') ? this : null;
+            
+            // could cause problems?
+            this.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            
+            const optionWrap = extraInfo.querySelector('.options-wrapper');
+    
+            if (!optionWrap.classList.contains("loaded")) {
+                fetchExtraInfo(this.getAttribute("product_id"), optionWrap);
+                optionWrap.classList.add('loaded');
+            }
+        });
+    });
+
+    document.addEventListener('click', function() {
+        if (currentActive) {
+            collapseActive();
+        }
+    })
+}
+
