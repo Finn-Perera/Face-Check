@@ -34,6 +34,8 @@ function createProducts() {
             product.setAttribute('product_id', element.productId)
 
             nameOfProd = document.createElement('h4');
+            nameOfProd.classList.add('line-clamped');
+            nameOfProd.classList.add('product-name');
             nameOfProd.textContent = element.productName;
 
             imgOfProd = document.createElement('img');
@@ -47,6 +49,10 @@ function createProducts() {
             imageWrapper = document.createElement('div');
             imageWrapper.classList.add('item-image-wrapper');
             
+            itemWrapper = document.createElement('div');
+            itemWrapper.classList.add('item-wrapper');
+
+
             //product.classList.add('active')
             extraInfo = document.createElement('div');
             extraInfo.classList.add('extra-info');
@@ -58,9 +64,10 @@ function createProducts() {
             
             imageWrapper.appendChild(imgOfProd);
             itemDataWrapper.appendChild(imageWrapper);
-            itemDataWrapper.appendChild(extraInfo);
-            product.appendChild(nameOfProd);
+            itemDataWrapper.appendChild(nameOfProd);
+            
             product.appendChild(itemDataWrapper);
+            product.appendChild(extraInfo);
             listOfItemsDoc.appendChild(product);
         });
 
