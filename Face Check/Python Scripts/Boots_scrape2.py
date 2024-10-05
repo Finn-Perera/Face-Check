@@ -2,30 +2,36 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
+from bs4 import BeautifulSoup
 import mysql.connector
 from mysql.connector import Error
 import requests
+import json
+import time
 
 # How to do searching
 #search_box = driver.find_element(By.CSS_SELECTOR, "input.cdx-text-input__input") 
 #search_box.click() 
 #search_box.send_keys("CSS Baltic")
 
-#def get_img(component):
-    
-            # if img_url.startswith('data:image'):
-            #     return img_url
-            # else:
-            #     try :
-            #         img_data = requests.get(img_url).content
-            #     except Exception as e:
-            #         print("Error occured gathering img data: ", e)
-
-            # return img_data
+def load_all_content(driver, load_button_locator):
+    maxCount = 100
+    count = 0
+    while count <= maxCount:
+        try:
+            load_more_button = driver.find_element(*load_button_locator)
+            driver.execute_script("arguments[0].scrollIntoView(true);", load_more_button)
+            driver.execute_script("arguments[0].click();", load_more_button)
+            count += 1
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"Error: {e}")
+            break
 
 def gather_items():
     options = webdriver.ChromeOptions() 
-    options.add_argument("--headless") # set headless mode, so it doesn't appear
+    #options.add_argument("--headless") # set headless mode, so it doesn't appear
     options.add_argument("--window-size=1920x1080")  # Set browser window size to standard resolution
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
     driver = webdriver.Chrome(options=options)
@@ -34,6 +40,10 @@ def gather_items():
     driver.get(url)
     items = []
     try:
+        print("here")
+        time.sleep(2)
+        load_all_content(driver, (By.CSS_SELECTOR, '[aria-label="view 24 more products"]'))
+        print("here2")
         div = driver.find_element(By.CSS_SELECTOR, 'div[data-insights-index="prod_live_products_uk"]')
         print("Div found:")
         
@@ -52,11 +62,11 @@ def gather_items():
             stars = 0
             reviewNum = 0
             hrefs = []
-            text = []
+
+            # For price:
+            price = element.find_element(By.CSS_SELECTOR, '.oct-teaser__productPrice').text
 
             driver.execute_script("arguments[0].scrollIntoView(true);", element)
-
-
             paragraphs_and_links = element.find_elements(By.XPATH, './/p | .//a | .//h3 |.//img')
             for component in paragraphs_and_links:
                 #print(f"\nTag: {component.tag_name}")
@@ -68,13 +78,11 @@ def gather_items():
 
                 if component.tag_name == "h3" :
                     name = component.text
-                elif component.text != None:
-                    text.append(component.text)
+            
                 for attribute_name in component.get_property('attributes'):
                     attribute = attribute_name['name']
                     if attribute == "href":
                         hrefs.append(component.get_attribute(attribute))
-
                     if attribute == "aria-label":
                         parts = component.get_attribute(attribute).split()
                         if "stars" in parts and "reviews" in parts: # gather reviews
@@ -85,7 +93,7 @@ def gather_items():
                     
                     value = component.get_attribute(attribute)
                     #print(f"{attribute}: {value}")
-            price = text[2] # select price str
+            
             price = price[1:] # strip £
             link = hrefs[0]
             name = name.strip()
@@ -104,5 +112,5 @@ def gather_items():
     if items == []:
         return None
     else:
+        print("Number of items: " + str(len(items)))
         return items
-

@@ -2,12 +2,33 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
 from bs4 import BeautifulSoup
 import mysql.connector
 from mysql.connector import Error
 import requests
 import json
 import time
+
+def load_all_content(driver, load_button_locator):
+    maxCount = 100
+    count = 0
+    while count <= maxCount:
+        try:
+            load_more_button = driver.find_element(*load_button_locator)
+            driver.execute_script("arguments[0].scrollIntoView(true);", load_more_button)
+            driver.execute_script("arguments[0].click();", load_more_button)
+            count += 1
+            time.sleep(1)
+        except NoSuchElementException:
+            print("Load More button not found. Loaded all content.")
+            break
+        except ElementNotInteractableException:
+            print("Load More button is not interactable. Loaded all content.")
+            break
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            break
 
 def gather_items():
     options = webdriver.ChromeOptions() 
@@ -21,11 +42,14 @@ def gather_items():
     items = []
 
     try:
-        #time.sleep(10)
+        load_all_content(driver, (By.CSS_SELECTOR, '.btn-load.more'))
+
         div = driver.find_element(By.CSS_SELECTOR, 'div[itemid="#product"]')
         print("Div found:")
+        #print(div.get_attribute("data-total-count"))
         
-        all_children = div.find_elements(By.CSS_SELECTOR, 'div[class="product"]')
+        all_children = div.find_elements(By.CSS_SELECTOR, 'div[class="product-grid-item"]')
+        #print(len(all_children))
 
         name = ""
         stars = 0
@@ -47,8 +71,8 @@ def gather_items():
 
             # Get size
             size_element = element.find_elements(By.CSS_SELECTOR, 'span.size-value')[0]
-            size = size_element.get_attribute('data-attr-value')
-
+            size = size_element.text
+            
             # Get rating Data
             review_elem = element.find_element(By.CSS_SELECTOR, 'a.bv_main_container.bv_hover.bv_inline_rating_container_left')
             label = review_elem.get_attribute('aria-label')
@@ -64,8 +88,9 @@ def gather_items():
             srcset = image_element.get_attribute('data-srcset')
             image_split = srcset.split()
             image = image_split[0]
-
-            name = f"The Ordinary {name} {size}"
+            name.strip()
+            size.strip()
+            name = f"The Ordinary {name} {size}" # this might change
             
             items.append((name, price, stars, reviewNum, href, "The Ordinary", image))
             #items.append((name, price, stars, reviewNum, link, "Boots", image_data))
@@ -77,4 +102,5 @@ def gather_items():
     if items == []:
         return None
     else:
+        print("Number of items: " + str(len(items)))
         return items

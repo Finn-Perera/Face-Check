@@ -31,7 +31,7 @@ def checkBeforeCommit(connection):
     elif user_input == 'rollback':
         connection.rollback()
         print("Transaction rolled back.")
-    else: 
+    else:
         print("Invalid input, rolling back transaction.")
         connection.rollback()
 
@@ -53,8 +53,8 @@ def writeItemsToDB(items):
             # name, price, stars, review_count, href, website, image_url
 
             insert_product_query = """
-            INSERT INTO products (product_name, product_image)
-            VALUES (%s, %s)
+            INSERT INTO products (product_name, product_image, lowest_cost)
+            VALUES (%s, %s, NULL)
             """
             insert_option_query = """
             INSERT INTO product_options (product_id, price, rating, num_reviews, href, website)
@@ -64,7 +64,7 @@ def writeItemsToDB(items):
             SELECT product_id FROM products WHERE product_name = %s
             """
             check_option_exists_query = """
-            SELECT option_id FROM product_options WHERE product_id = %s AND href = %s
+            SELECT option_id FROM product_options WHERE product_id = %s AND website = %s
             """
 
             # Obsolete but maybe need to come back to them
@@ -111,20 +111,26 @@ def writeItemsToDB(items):
             # Works, could probably be more efficient but this took hours to debug and may not be worth it.
             for item in items:
                 name, price, stars, review_count, href, website, prod_img = item
-
                 cursor.execute(check_product_exists_query, (name,))
                 res = cursor.fetchone()
-
-                if res:
+                #print("res: ")
+                #print(res)
+                if res != None:
                     prod_id = res[0]
                 else:
                     cursor.execute(insert_product_query, (name, prod_img))
                     prod_id = cursor.lastrowid
 
+                #print("prod_id:")
+                #print(prod_id)
+
                 cursor.execute(check_option_exists_query, (prod_id, website))
                 res = cursor.fetchone()
 
-                if not res:
+                #print("res2: ")
+                #print(res)
+
+                if res == None:
                     cursor.execute(insert_option_query, (prod_id, price, stars, review_count, href, website))
             
             print("Changes have been made: ")
