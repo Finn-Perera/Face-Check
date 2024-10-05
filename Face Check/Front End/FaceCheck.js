@@ -28,98 +28,66 @@ function createProducts() {
 
         const listOfItemsDoc = document.getElementById('items')
         products.forEach(element => {
-            
+            // Building the item html
             var product = document.createElement('div');
-            product.classList.add('item');
-            product.setAttribute('product_id', element.productId)
 
+            // Setting css class and attributes
+            product.classList.add('item');
+            product.setAttribute('product_id', element.productId) // good/bad idea?
+
+            // Name Element
             nameOfProd = document.createElement('h4');
             nameOfProd.classList.add('line-clamped');
             nameOfProd.classList.add('product-name');
             nameOfProd.textContent = element.productName;
 
+            // Lowest Cost Element
+            lowestCostOfProd = document.createElement('a'); // make linkable?
+            lowestCostOfProd.classList.add('product-lowest-cost');
+            lowestCostOfProd.textContent = `£${parseFloat(element.lowestCost).toFixed(2)}`;
+
+            // Image Element
             imgOfProd = document.createElement('img');
             imgOfProd.src = element.productImage;
             imgOfProd.classList.add('item-image');
-            imgOfProd.alt = "Description"; // change this
+            imgOfProd.alt = "Description"; // change this, could be prod name
 
-            itemDataWrapper = document.createElement('div');
-            itemDataWrapper.classList.add('item-data-wrapper');
-            
+            // Image Wrapper
             imageWrapper = document.createElement('div');
             imageWrapper.classList.add('item-image-wrapper');
+            imageWrapper.appendChild(imgOfProd);
+
+            // Data Wrapper containing name, image, low cost
+            itemDataWrapper = document.createElement('div');
+            itemDataWrapper.classList.add('item-data-wrapper');
+            itemDataWrapper.appendChild(imageWrapper);
+            itemDataWrapper.appendChild(nameOfProd);
+            itemDataWrapper.appendChild(lowestCostOfProd);
+            // add lowest cost item
             
+            // Deprecated??
             itemWrapper = document.createElement('div');
             itemWrapper.classList.add('item-wrapper');
 
-
-            //product.classList.add('active')
+            // Pop-out information displaying product options
             extraInfo = document.createElement('div');
             extraInfo.classList.add('extra-info');
             extraInfo.style.display = 'none';
 
+            // Options Wrapper holds product's options
             optionsWrapper = document.createElement('div');
             optionsWrapper.classList.add('options-wrapper');
             extraInfo.appendChild(optionsWrapper);
             
-            imageWrapper.appendChild(imgOfProd);
-            itemDataWrapper.appendChild(imageWrapper);
-            itemDataWrapper.appendChild(nameOfProd);
-            
+            // Bring wrappers and elements together
             product.appendChild(itemDataWrapper);
             product.appendChild(extraInfo);
+
+            // Add to item display panel
             listOfItemsDoc.appendChild(product);
         });
 
         attachEventListeners();
-        /*items.forEach(element => {
-            var item = document.createElement('div');
-            item.classList.add('item');
-            
-            nameOfProd = document.createElement('h4');
-            nameOfProd.textContent = element.name;
-            
-            
-            imageOfProd = document.createElement('img');
-            imageOfProd.src = element.imageUrl;
-            imageOfProd.classList.add('item-image');
-            imageOfProd.alt="Description";
-
-            imageWrapper = document.createElement('a');
-            imageWrapper.classList.add('item-image-wrapper');
-            imageWrapper.appendChild(imageOfProd);
-            
-            cost = document.createElement('h5');
-            cost.textContent = "£" + element.price.toFixed(2); // rudimentary, only uk?
-
-            review = document.createElement('div');
-            review.classList.add('review');
-            // these shouldnt be div but not sure what it should be yet
-            reviewRating = document.createElement('div'); 
-            reviewNum = document.createElement('div')
-            reviewRating.textContent = element.rating + "★";
-            reviewNum.textContent = element.numReviews + " Reviews";
-            review.appendChild(reviewRating);
-            review.appendChild(reviewNum);
-
-            //refLink = document.createElement('a');
-            imageWrapper.href = element.referenceLink;
-            imageWrapper.target = '_blank';
-            imageWrapper.rel = 'noopener noreferrer';
-            //refLink.textContent = element.referenceLink;
-
-            websiteOrigin = document.createElement('h6');
-            websiteOrigin.textContent = element.website;
-            
-            item.appendChild(nameOfProd);
-            item.appendChild(imageWrapper);
-            item.appendChild(cost);
-            item.appendChild(review);
-            //item.appendChild(refLink);
-            item.appendChild(websiteOrigin);
-
-            listOfItemsDoc.appendChild(item);
-        });*/
     })
     .catch(error => console.error('Error fetching items: ', error));
 }
