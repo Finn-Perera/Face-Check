@@ -1,19 +1,46 @@
 let currentActive = null;
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    createProducts();
-});
-
 function collapseActive() {
     currentActive.querySelector('.extra-info').style.display = 'none';
     currentActive.classList.remove('active');
     currentActive = null;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetchProducts(null, null);
+});
+
+document.getElementById("price-filter-button").addEventListener('click', () => {
+    const minPrice = document.getElementById("minPrice").value;
+    const maxPrice = document.getElementById("maxPrice").value;
+
+    if (isNaN(minPrice) || (minPrice < 0)) {
+        return
+    }
+
+    if (isNaN(maxPrice) || (maxPrice < 0)) {
+        return;
+    }
+
+    fetchProducts(minPrice, maxPrice)
+})
+
 // maybe display with 'greatest value' aka largest difference between low cost and average
 
-function createProducts() {
-    fetch('http://localhost:8080/products')
+function fetchProducts(minPrice, maxPrice) {
+    const baseURL = 'http://localhost:8080/products';
+    const params = new URLSearchParams();
+    
+    if (minPrice != null && !isNaN(minPrice)) {
+        params.append('min_price', minPrice);
+    }
+    if (maxPrice != null && !isNaN(maxPrice)) {
+        params.append('max_price', maxPrice);
+    }
+
+    const fetchProdString = params.toString() ? `${baseURL}?${params.toString()}` : baseURL;
+
+    fetch(fetchProdString)
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -22,74 +49,77 @@ function createProducts() {
         return response.json();
     })
     .then(products => {
-        console.log(products);
-
-        console.log(products[0])
-
-        const listOfItemsDoc = document.getElementById('items')
-        products.forEach(element => {
-            // Building the item html
-            var product = document.createElement('div');
-
-            // Setting css class and attributes
-            product.classList.add('item');
-            product.setAttribute('product_id', element.productId) // good/bad idea?
-
-            // Name Element
-            nameOfProd = document.createElement('h4');
-            nameOfProd.classList.add('line-clamped');
-            nameOfProd.classList.add('product-name');
-            nameOfProd.textContent = element.productName;
-
-            // Lowest Cost Element
-            lowestCostOfProd = document.createElement('a'); // make linkable?
-            lowestCostOfProd.classList.add('product-lowest-cost');
-            lowestCostOfProd.textContent = `£${parseFloat(element.lowestCost).toFixed(2)}`;
-
-            // Image Element
-            imgOfProd = document.createElement('img');
-            imgOfProd.src = element.productImage;
-            imgOfProd.classList.add('item-image');
-            imgOfProd.alt = "Description"; // change this, could be prod name
-
-            // Image Wrapper
-            imageWrapper = document.createElement('div');
-            imageWrapper.classList.add('item-image-wrapper');
-            imageWrapper.appendChild(imgOfProd);
-
-            // Data Wrapper containing name, image, low cost
-            itemDataWrapper = document.createElement('div');
-            itemDataWrapper.classList.add('item-data-wrapper');
-            itemDataWrapper.appendChild(imageWrapper);
-            itemDataWrapper.appendChild(nameOfProd);
-            itemDataWrapper.appendChild(lowestCostOfProd);
-            // add lowest cost item
-            
-            // Deprecated??
-            itemWrapper = document.createElement('div');
-            itemWrapper.classList.add('item-wrapper');
-
-            // Pop-out information displaying product options
-            extraInfo = document.createElement('div');
-            extraInfo.classList.add('extra-info');
-            extraInfo.style.display = 'none';
-
-            // Options Wrapper holds product's options
-            optionsWrapper = document.createElement('div');
-            optionsWrapper.classList.add('options-wrapper');
-            extraInfo.appendChild(optionsWrapper);
-            
-            // Bring wrappers and elements together
-            product.appendChild(itemDataWrapper);
-            product.appendChild(extraInfo);
-
-            // Add to item display panel
-            listOfItemsDoc.appendChild(product);
-        });
+        createProducts(products)
 
         attachEventListeners();
     })
     .catch(error => console.error('Error fetching items: ', error));
+}
+
+function createProducts(products) {
+    const listOfItemsDoc = document.getElementById('items')
+    listOfItemsDoc.innerHTML = ''; // clears items
+
+    products.forEach(element => {
+    // Building the item html
+    var product = document.createElement('div');
+
+    // Setting css class and attributes
+    product.classList.add('item');
+    product.setAttribute('product_id', element.productId) // good/bad idea?
+
+    // Name Element
+    nameOfProd = document.createElement('h4');
+    nameOfProd.classList.add('line-clamped');
+    nameOfProd.classList.add('product-name');
+    nameOfProd.textContent = element.productName;
+
+    // Lowest Cost Element
+    lowestCostOfProd = document.createElement('a'); // make linkable?
+    lowestCostOfProd.classList.add('product-lowest-cost');
+    lowestCostOfProd.textContent = `£${parseFloat(element.lowestCost).toFixed(2)}`;
+
+    // Image Element
+    imgOfProd = document.createElement('img');
+    imgOfProd.src = element.productImage;
+    imgOfProd.classList.add('item-image');
+    imgOfProd.alt = "Description"; // change this, could be prod name
+    imgOfProd.draggable = false;
+
+    // Image Wrapper
+    imageWrapper = document.createElement('div');
+    imageWrapper.classList.add('item-image-wrapper');
+    imageWrapper.appendChild(imgOfProd);
+
+    // Data Wrapper containing name, image, low cost
+    itemDataWrapper = document.createElement('div');
+    itemDataWrapper.classList.add('item-data-wrapper');
+    itemDataWrapper.appendChild(imageWrapper);
+    itemDataWrapper.appendChild(nameOfProd);
+    itemDataWrapper.appendChild(lowestCostOfProd);
+    // add lowest cost item
+    
+    // Deprecated??
+    itemWrapper = document.createElement('div');
+    itemWrapper.classList.add('item-wrapper');
+
+    // Pop-out information displaying product options
+    extraInfo = document.createElement('div');
+    extraInfo.classList.add('extra-info');
+    extraInfo.style.display = 'none';
+
+    // Options Wrapper holds product's options
+    optionsWrapper = document.createElement('div');
+    optionsWrapper.classList.add('options-wrapper');
+    extraInfo.appendChild(optionsWrapper);
+    
+    // Bring wrappers and elements together
+    product.appendChild(itemDataWrapper);
+    product.appendChild(extraInfo);
+
+    // Add to item display panel
+    listOfItemsDoc.appendChild(product);
+    });
 }
 
 // whenever you call you should check that the element doesnt already have the info
@@ -103,7 +133,6 @@ function fetchExtraInfo(prodId, optionsWrapperElement) {
     })
     .then(options => {
         options.forEach(option => {
-            console.log(option);
             optionElement = document.createElement('div');
             optionElement.classList.add('option-element');
 

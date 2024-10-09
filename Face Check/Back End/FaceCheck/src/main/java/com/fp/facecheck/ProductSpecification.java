@@ -4,7 +4,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 // a specification is a filter, using criteria to form a query on the db
 public class ProductSpecification {
-    private static final String PRODUCT_LOWEST_COST = "lowest_cost";
+    private static final String PRODUCT_LOWEST_COST = "lowestCost";
 
     public static Specification<Product> hasPriceBetween(Double minPrice, Double maxPrice) {
         return ((root, query, criteriaBuilder) -> {

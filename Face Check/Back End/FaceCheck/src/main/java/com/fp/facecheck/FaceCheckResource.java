@@ -29,8 +29,8 @@ public class FaceCheckResource {
      */
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Product>> getProducts(
-            @RequestParam(name="price_min", required = false) final Double minPrice,
-            @RequestParam(name="price_max", required = false) final Double maxPrice) {
+            @RequestParam(name="min_price", required = false) final Double minPrice,
+            @RequestParam(name="max_price", required = false) final Double maxPrice) {
         try {
             List<Product> productsToReturn = productServices.findProducts(minPrice, maxPrice);
             return productsToReturn.isEmpty() ?

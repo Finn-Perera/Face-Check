@@ -13,7 +13,7 @@ public class Product {
     private int productId;
     private String productName;
     private String productImage;
-    private double lowestCost;
+    private Double lowestCost;
     @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductOption> options;
@@ -64,6 +64,6 @@ public class Product {
     public void setProductImage(String productImage) {
         this.productImage = productImage;
     }
-    public double getLowestCost() { return  lowestCost; }
-    public void setLowestCost(double lowestCost) { this.lowestCost = lowestCost; }
+    public Double getLowestCost() { return  lowestCost; }
+    public void setLowestCost(Double lowestCost) { this.lowestCost = lowestCost; }
 }
