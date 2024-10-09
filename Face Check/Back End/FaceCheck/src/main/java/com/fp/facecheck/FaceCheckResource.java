@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -14,20 +15,24 @@ import java.util.Optional;
 public class FaceCheckResource {
 
     private final ProductRepository prodRepo;
+    private final ProductServices productServices;
 
-    public FaceCheckResource(ProductRepository prodRepo) {
+    public FaceCheckResource(ProductRepository prodRepo, ProductServices productServices) {
         this.prodRepo = prodRepo;
+        this.productServices = productServices;
     }
 
     /**
-     * Gathers all products
+     * Gathers all products, filtered by min and max price
      *
-     * @return List of products
+     * @return List of filtered products
      */
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Product>> getProducts() {
+    public ResponseEntity<List<Product>> getProducts(
+            @RequestParam(name="price_min", required = false) final Double minPrice,
+            @RequestParam(name="price_max", required = false) final Double maxPrice) {
         try {
-            List<Product> productsToReturn = prodRepo.findAll();
+            List<Product> productsToReturn = productServices.findProducts(minPrice, maxPrice);
             return productsToReturn.isEmpty() ?
                     ResponseEntity.notFound().build() :
                     ResponseEntity.ok(productsToReturn);
