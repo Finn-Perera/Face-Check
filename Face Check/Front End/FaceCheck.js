@@ -7,7 +7,8 @@ function collapseActive() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetchProducts(null, null);
+    fetchProducts(null, null, null);
+    fetchBrands();
 });
 
 document.getElementById("price-filter-button").addEventListener('click', () => {
@@ -22,22 +23,37 @@ document.getElementById("price-filter-button").addEventListener('click', () => {
         return;
     }
 
-    fetchProducts(minPrice, maxPrice)
-})
+    fetchProducts(minPrice, maxPrice, gatherChecked())
+});
 
 // maybe display with 'greatest value' aka largest difference between low cost and average
+function gatherChecked() {
+    const checked = document.querySelectorAll('input[name="brand"]:checked');
+    const selected = Array.from(checked).map(checked => checked.value);
 
-function fetchProducts(minPrice, maxPrice) {
+    if (selected === undefined || selected.length == 0) {
+        return null;
+    }
+
+    return selected;   
+}
+
+function fetchProducts(minPrice, maxPrice, brands) {
     const baseURL = 'http://localhost:8080/products';
     const params = new URLSearchParams();
     
+    if (brands != null && brands !== undefined && brands.length !== 0) {
+        for (let b of brands) {
+            params.append('brand', b);
+        }
+    }
     if (minPrice != null && !isNaN(minPrice)) {
         params.append('min_price', minPrice);
     }
     if (maxPrice != null && !isNaN(maxPrice)) {
         params.append('max_price', maxPrice);
     }
-
+    
     const fetchProdString = params.toString() ? `${baseURL}?${params.toString()}` : baseURL;
 
     fetch(fetchProdString)
@@ -45,7 +61,6 @@ function fetchProducts(minPrice, maxPrice) {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        //console.log(response)
         return response.json();
     })
     .then(products => {
@@ -156,7 +171,6 @@ function fetchExtraInfo(prodId, optionsWrapperElement) {
             optionPriceWrap.href = hrefLink;
             optionPriceWrap.target = '_blank';
 
-            
             optionElement.appendChild(optionWebsite);
             optionElement.appendChild(optionRating);
             optionElement.appendChild(optionPriceWrap);
@@ -164,6 +178,45 @@ function fetchExtraInfo(prodId, optionsWrapperElement) {
         })
     })
     .catch(error => console.error('Error fetching extra information: ', error));
+}
+
+function fetchBrands() {
+    fetch(`http://localhost:8080/brands`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    }).then(brands => {
+        const checklistWrapper = document.querySelector(".checkbox-wrapper");
+        brands.forEach(brand => {
+            createBrandChecklist(brand, checklistWrapper);
+        });
+    }).catch(error => console.error('Error fetching brands: ', error));
+}
+
+function createBrandChecklist(brand, checklistWrapper) {
+    bSplit = brand.split(",");
+    brandName = bSplit[0];
+    brandCount = bSplit[1];
+
+    if (brandName === "") {
+        brandName = "Others"; // find a way to put this at the bottom
+    }
+
+    inputElement = document.createElement('input');
+    inputElement.type = "checkbox";
+    inputElement.id =`${brandName}-checkbox`;
+    inputElement.value = `${brandName}`;
+    inputElement.name = "brand";
+
+    labelElement = document.createElement('label');
+    labelElement.htmlFor = `${brandName}-checkbox`;
+    labelElement.textContent = `${brandName} (${brandCount})`;
+
+    checklistWrapper.appendChild(inputElement);
+    checklistWrapper.appendChild(labelElement);
+    checklistWrapper.appendChild(document.createElement('br'));
 }
 
 function attachEventListeners() {
@@ -208,4 +261,3 @@ function attachEventListeners() {
         }
     })
 }
-

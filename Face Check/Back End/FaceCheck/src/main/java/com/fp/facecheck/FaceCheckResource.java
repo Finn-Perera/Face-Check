@@ -30,9 +30,10 @@ public class FaceCheckResource {
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Product>> getProducts(
             @RequestParam(name="min_price", required = false) final Double minPrice,
-            @RequestParam(name="max_price", required = false) final Double maxPrice) {
+            @RequestParam(name="max_price", required = false) final Double maxPrice,
+            @RequestParam(name="brand", required = false) List<String> brands) {
         try {
-            List<Product> productsToReturn = productServices.findProducts(minPrice, maxPrice);
+            List<Product> productsToReturn = productServices.findProducts(minPrice, maxPrice, brands);
             return productsToReturn.isEmpty() ?
                     ResponseEntity.notFound().build() :
                     ResponseEntity.ok(productsToReturn);
@@ -48,7 +49,7 @@ public class FaceCheckResource {
      * @param id product id
      * @return List of product options
      */
-    @GetMapping(value = "products/{id}/options", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/products/{id}/options", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProductOption>> getProductOptions(@PathVariable Long id) {
         try {
             Optional<Product> productOptional = prodRepo.findById(id);
@@ -61,6 +62,20 @@ public class FaceCheckResource {
                 return ResponseEntity.notFound().build();
             } else {
                 return ResponseEntity.ok(optionsToReturn);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping(value="/brands", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<String>> getBrands() {
+        try {
+            List<String> brandsToReturn = productServices.findDistinctProductBrands();
+            if (brandsToReturn.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            } else {
+                return ResponseEntity.ok(brandsToReturn);
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

@@ -14,10 +14,15 @@ public class ProductServices {
         this.productRepository = productRepository;
     }
 
-    public List<Product> findProducts(Double minPrice, Double maxPrice) {
+    public List<Product> findProducts(Double minPrice, Double maxPrice, List<String> brands) {
         Specification<Product> specification =
-                Specification.where(ProductSpecification.hasPriceBetween(minPrice, maxPrice));
+                Specification.where(ProductSpecification.hasPriceBetween(minPrice, maxPrice)
+                        .and(ProductSpecification.hasBrand(brands)));
 
         return productRepository.findAll(specification);
+    }
+
+    public List<String> findDistinctProductBrands() {
+        return productRepository.findDistinctBrands();
     }
 }
