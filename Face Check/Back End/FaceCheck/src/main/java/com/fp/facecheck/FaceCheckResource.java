@@ -1,5 +1,6 @@
 package com.fp.facecheck;
 
+import com.fp.facecheck.dtos.BrandCountDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,9 +70,9 @@ public class FaceCheckResource {
     }
 
     @GetMapping(value="/brands", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<String>> getBrands() {
+    public ResponseEntity<List<BrandCountDTO>> getBrands() {
         try {
-            List<String> brandsToReturn = productServices.findDistinctProductBrands();
+            List<BrandCountDTO> brandsToReturn = productServices.findDistinctProductBrands();
             if (brandsToReturn.isEmpty()) {
                 return ResponseEntity.notFound().build();
             } else {

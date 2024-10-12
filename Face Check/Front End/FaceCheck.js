@@ -196,9 +196,8 @@ function fetchBrands() {
 }
 
 function createBrandChecklist(brand, checklistWrapper) {
-    bSplit = brand.split(",");
-    brandName = bSplit[0];
-    brandCount = bSplit[1];
+    brandName = brand.productBrand;
+    brandCount = brand.count;
 
     if (brandName === "") {
         brandName = "Others"; // find a way to put this at the bottom

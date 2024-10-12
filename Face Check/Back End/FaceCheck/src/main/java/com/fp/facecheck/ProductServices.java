@@ -1,5 +1,6 @@
 package com.fp.facecheck;
 
+import com.fp.facecheck.dtos.BrandCountDTO;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class ProductServices {
         return productRepository.findAll(specification);
     }
 
-    public List<String> findDistinctProductBrands() {
+    public List<BrandCountDTO> findDistinctProductBrands() {
         return productRepository.findDistinctBrands();
     }
 }
