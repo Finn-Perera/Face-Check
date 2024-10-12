@@ -7,7 +7,7 @@ function collapseActive() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetchProducts(null, null, null);
+    fetchProducts(null, null, null, null);
     fetchBrands();
 });
 
@@ -23,7 +23,7 @@ document.getElementById("price-filter-button").addEventListener('click', () => {
         return;
     }
 
-    fetchProducts(minPrice, maxPrice, gatherChecked())
+    fetchProducts(minPrice, maxPrice, gatherChecked(), null)
 });
 
 // maybe display with 'greatest value' aka largest difference between low cost and average
@@ -38,24 +38,39 @@ function gatherChecked() {
     return selected;   
 }
 
-function fetchProducts(minPrice, maxPrice, brands) {
-    const baseURL = 'http://localhost:8080/products';
+function searchProducts() {
+    let input = document.getElementById('searchInput').value.toLowerCase();
+    fetchProducts(null, null, null, input);
+}
+
+function createURL(minPrice, maxPrice, brands, search) {
+    let baseURL = 'http://localhost:8080/products';
     const params = new URLSearchParams();
     
-    if (brands != null && brands !== undefined && brands.length !== 0) {
-        for (let b of brands) {
-            params.append('brand', b);
+    // If search is not null, then force search only
+    // May change later
+    if (search != null) {
+        params.append('value', search);
+        baseURL += '/search';
+    } else {
+        if (brands != null && brands !== undefined && brands.length !== 0) {
+            for (let b of brands) {
+                params.append('brand', b);
+            }
+        }
+        if (minPrice != null && !isNaN(minPrice)) {
+            params.append('min_price', minPrice);
+        }
+        if (maxPrice != null && !isNaN(maxPrice)) {
+            params.append('max_price', maxPrice);
         }
     }
-    if (minPrice != null && !isNaN(minPrice)) {
-        params.append('min_price', minPrice);
-    }
-    if (maxPrice != null && !isNaN(maxPrice)) {
-        params.append('max_price', maxPrice);
-    }
-    
-    const fetchProdString = params.toString() ? `${baseURL}?${params.toString()}` : baseURL;
 
+    return params.toString() ? `${baseURL}?${params.toString()}` : baseURL;
+}
+
+function fetchProducts(minPrice, maxPrice, brands, search) {
+    const fetchProdString = createURL(minPrice, maxPrice, brands, search);
     fetch(fetchProdString)
     .then(response => {
         if (!response.ok) {
@@ -205,12 +220,12 @@ function createBrandChecklist(brand, checklistWrapper) {
 
     inputElement = document.createElement('input');
     inputElement.type = "checkbox";
-    inputElement.id =`${brandName}-checkbox`;
+    inputElement.id =`${brandName}Checkbox`;
     inputElement.value = `${brandName}`;
     inputElement.name = "brand";
 
     labelElement = document.createElement('label');
-    labelElement.htmlFor = `${brandName}-checkbox`;
+    labelElement.htmlFor = `${brandName}Checkbox`;
     labelElement.textContent = `${brandName} (${brandCount})`;
 
     checklistWrapper.appendChild(inputElement);

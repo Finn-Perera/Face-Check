@@ -55,27 +55,22 @@ section {
 }
 
 .item-section-title {
-    /*
-    width: 100vw;
-    height: 20vh;
-    border-radius: 50%;
-    */
     position: relative;
-    /*transform: translate(0, 50%);*/ 
     text-align: center;
     width: 100vw;
     height: 10vh;
-    padding: 20px;    
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;  
 }
 
 .item-section-title span {
-    transform: translate(-50%, 0);
-    position: absolute;
     font-size: 56px;
-
 }
 
-.sidebar-item-container {
+.sidebar-and-item-container {
     display: flex;
     flex-wrap: nowrap;
     position: relative;
@@ -190,6 +185,7 @@ section {
     display: -webkit-box;
     -webkit-box-orient: vertical; 
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     overflow: hidden; 
     text-overflow: ellipsis;
 }

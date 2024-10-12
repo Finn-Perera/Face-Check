@@ -26,4 +26,9 @@ public class ProductServices {
     public List<BrandCountDTO> findDistinctProductBrands() {
         return productRepository.findDistinctBrands();
     }
+
+    public List<Product> searchProducts(String searchText) {
+        Specification<Product> specification = Specification.where(ProductSpecification.searchByText(searchText));
+        return productRepository.findAll(specification);
+    }
 }
