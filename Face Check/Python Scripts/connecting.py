@@ -53,8 +53,8 @@ def writeItemsToDB(items):
             # name, price, stars, review_count, href, website, image_url
 
             insert_product_query = """
-            INSERT INTO products (product_name, product_image, lowest_cost)
-            VALUES (%s, %s, NULL)
+            INSERT INTO products (product_name, product_image, lowest_cost, product_brand)
+            VALUES (%s, %s, NULL, %s)
             """
             insert_option_query = """
             INSERT INTO product_options (product_id, price, rating, num_reviews, href, website)
@@ -111,6 +111,11 @@ def writeItemsToDB(items):
             # Works, could probably be more efficient but this took hours to debug and may not be worth it.
             for item in items:
                 name, price, stars, review_count, href, website, prod_img = item
+                brand_name = getBrand(name)
+                if brand_name == None:
+                    print("Error with getting brand from item: " + name + " " + website)
+                    continue
+                
                 cursor.execute(check_product_exists_query, (name,))
                 res = cursor.fetchone()
                 #print("res: ")
@@ -118,7 +123,7 @@ def writeItemsToDB(items):
                 if res != None:
                     prod_id = res[0]
                 else:
-                    cursor.execute(insert_product_query, (name, prod_img))
+                    cursor.execute(insert_product_query, (name, prod_img, brand_name))
                     prod_id = cursor.lastrowid
 
                 #print("prod_id:")
@@ -152,41 +157,6 @@ def writeItemsToDB(items):
             connection.close()
             print("Connection closed")
 
-
-def writeItem():
-    try:
-        connection = mysql.connector.connect(
-            host = os.getenv('DB_HOST'),
-            user = os.getenv('DB_USER'),
-            password = os.getenv('DB_PASSWORD'),
-            database = os.getenv('DB_NAME')
-        )
-
-        if connection.is_connected():
-            print("Successfully connected to the databases")
-
-            cursor = connection.cursor()
-            sql_insert_query = """
-            INSERT INTO items (item_name, price, rating, num_reviews, href, website)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """
-            values = ("facewash", 5.10, 4.5, 10, "https://www.boots.com/the-ordinary-niacinamide-10-zinc-1-10267783", "Boots")
-            cursor.execute(sql_insert_query, values)
-
-            print("Changes have been made: ")
-            cursor.execute("SELECT * FROM items")
-            rows = cursor.fetchall()
-            for item in rows:
-                print(item)
-            checkBeforeCommit(connection)
-    except Error as e:
-        print(f"Error: {e}")
-    finally:
-        if connection and connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("Connection closed")
-
 def read():
     try:
         connection = connector()
@@ -195,7 +165,7 @@ def read():
             print("Successfully connected to the databases")
             
             cursor = connection.cursor()
-            cursor.execute("SELECT * FROM items")
+            cursor.execute("SELECT * FROM products")
             for row in cursor.fetchall():
                 print(row)
     except Error as e:
@@ -206,7 +176,32 @@ def read():
             connection.close()
             print("Connection closed")
 
+# Problem cases are : The Ordinary, Soap & Glory, Nip + Fab, La Roche ... and so on
+# Maybe just hard code for now?
+prefixes = ["The", "La", "Le"]
+connectors = ["&", "+"]
 
+def getBrand(product_name):
+    # Maybe have a known brands check
+
+    split_name = product_name.split()
+    if len(split_name) == 0:
+        return None
+    elif len(split_name) == 1:
+        return split_name[0]
+    
+    brand_name = split_name[0]
+    
+    if split_name[0] in prefixes:
+        if len(split_name) > 1:
+            brand_name += " " + split_name[1]
+
+    if split_name[1] in connectors:
+        if len(split_name) > 3:
+            brand_name += " " + split_name[1] + " " + split_name[2] 
+
+    return brand_name
+        
 #writeItem()
 
 #read()

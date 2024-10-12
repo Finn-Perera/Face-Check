@@ -16,7 +16,7 @@ import time
 #search_box.send_keys("CSS Baltic")
 
 def load_all_content(driver, load_button_locator):
-    maxCount = 100
+    maxCount = 10 # CAN CHANGE THIS
     count = 0
     while count <= maxCount:
         try:
@@ -63,10 +63,21 @@ def gather_items():
             reviewNum = 0
             hrefs = []
 
+            driver.execute_script("arguments[0].scrollIntoView(true);", element)
+
             # For price:
             price = element.find_element(By.CSS_SELECTOR, '.oct-teaser__productPrice').text
 
-            driver.execute_script("arguments[0].scrollIntoView(true);", element)
+            # For Reviews:
+            review_elem = element.find_element(By.CSS_SELECTOR, '.oct-reviews__count')
+            parts = review_elem.get_attribute("aria-label").split()
+            if "stars" in parts and "reviews" in parts:
+                stars_index = parts.index("stars") - 1
+                stars = parts[stars_index] if stars_index >= 0 else None
+                reviews_index = parts.index("reviews") - 1
+                reviewNum = parts[reviews_index] if reviews_index >= 0 else None
+
+            
             paragraphs_and_links = element.find_elements(By.XPATH, './/p | .//a | .//h3 |.//img')
             for component in paragraphs_and_links:
                 #print(f"\nTag: {component.tag_name}")
@@ -78,18 +89,11 @@ def gather_items():
 
                 if component.tag_name == "h3" :
                     name = component.text
-            
+
                 for attribute_name in component.get_property('attributes'):
                     attribute = attribute_name['name']
                     if attribute == "href":
-                        hrefs.append(component.get_attribute(attribute))
-                    if attribute == "aria-label":
-                        parts = component.get_attribute(attribute).split()
-                        if "stars" in parts and "reviews" in parts: # gather reviews
-                            stars_index = parts.index("stars") - 1
-                            stars = parts[stars_index] if stars_index >= 0 else None
-                            reviews_index = parts.index("reviews") - 1
-                            reviewNum = parts[reviews_index] if reviews_index >= 0 else None
+                        hrefs.append(component.get_attribute(attribute))                        
                     
                     value = component.get_attribute(attribute)
                     #print(f"{attribute}: {value}")
