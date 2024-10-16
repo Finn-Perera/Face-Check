@@ -1,6 +1,9 @@
 package com.fp.facecheck;
 
 import com.fp.facecheck.dtos.BrandCountDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,12 +12,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 public class FaceCheckResource {
-
+    private static final Logger logger = LoggerFactory.getLogger(FaceCheckResource.class);
     private final ProductRepository prodRepo;
     private final ProductServices productServices;
 
@@ -32,11 +36,12 @@ public class FaceCheckResource {
     public ResponseEntity<List<Product>> getProducts(
             @RequestParam(name = "min_price", required = false) final Double minPrice,
             @RequestParam(name = "max_price", required = false) final Double maxPrice,
-            @RequestParam(name = "brand", required = false) List<String> brands) {
+            @RequestParam(name = "brand", required = false) final List<String> brands,
+            @RequestParam(name = "rating", required = false) final Double rating) {
         try {
-            List<Product> productsToReturn = productServices.findProducts(minPrice, maxPrice, brands);
+            List<Product> productsToReturn = productServices.findProducts(minPrice, maxPrice, brands, rating);
             return productsToReturn.isEmpty() ?
-                    ResponseEntity.notFound().build() :
+                    ResponseEntity.noContent().build() :
                     ResponseEntity.ok(productsToReturn);
         } catch (Exception e) {
             System.out.println("Internal Server Error: " + e);
@@ -60,7 +65,7 @@ public class FaceCheckResource {
 
             List<ProductOption> optionsToReturn = productOptional.get().getOptions();
             if (optionsToReturn.isEmpty()) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.ok(optionsToReturn);
             }
@@ -74,7 +79,7 @@ public class FaceCheckResource {
         try {
             List<BrandCountDTO> brandsToReturn = productServices.findDistinctProductBrands();
             if (brandsToReturn.isEmpty()) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.ok(brandsToReturn);
             }
@@ -85,7 +90,7 @@ public class FaceCheckResource {
 
     @GetMapping(value = "/products/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Product>> getSearchedProducts(
-            @RequestParam(name = "value", required = true) final String searchText) {
+            @RequestParam(name = "value") final String searchText) {
         try {
             List<Product> productsToReturn = productServices.searchProducts(searchText);
             if (productsToReturn.isEmpty()) {

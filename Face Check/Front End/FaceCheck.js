@@ -1,4 +1,5 @@
 let currentActive = null;
+let brandsList = [];
 
 function collapseActive() {
     currentActive.querySelector('.extra-info').style.display = 'none';
@@ -7,7 +8,8 @@ function collapseActive() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetchProducts(null, null, null, null);
+    ratingsOnOpen()
+    fetchProducts(null, null, null, null, null);
     fetchBrands();
 });
 
@@ -23,7 +25,7 @@ document.getElementById("price-filter-button").addEventListener('click', () => {
         return;
     }
 
-    fetchProducts(minPrice, maxPrice, gatherChecked(), null)
+    fetchProducts(minPrice, maxPrice, gatherChecked(), null, gatherRadioChecked())
 });
 
 // maybe display with 'greatest value' aka largest difference between low cost and average
@@ -38,12 +40,22 @@ function gatherChecked() {
     return selected;   
 }
 
-function searchProducts() {
-    let input = document.getElementById('searchInput').value.toLowerCase();
-    fetchProducts(null, null, null, input);
+function gatherRadioChecked() {
+    const checked = document.querySelector('input[name="radio-rating"]:checked');
+    value = parseFloat(checked.value);
+    if (checked === undefined || checked === null) {
+        return null;
+    }
+
+    return value;
 }
 
-function createURL(minPrice, maxPrice, brands, search) {
+function searchProducts() {
+    let input = document.getElementById('searchInput').value.toLowerCase();
+    fetchProducts(null, null, null, input, null);
+}
+
+function createURL(minPrice, maxPrice, brands, search, rating) {
     let baseURL = 'http://localhost:8080/products';
     const params = new URLSearchParams();
     
@@ -64,15 +76,49 @@ function createURL(minPrice, maxPrice, brands, search) {
         if (maxPrice != null && !isNaN(maxPrice)) {
             params.append('max_price', maxPrice);
         }
+        if (rating != null && !isNaN(rating) && rating >= 0) {
+            params.append('rating', rating);
+        }
     }
 
     return params.toString() ? `${baseURL}?${params.toString()}` : baseURL;
 }
 
-function fetchProducts(minPrice, maxPrice, brands, search) {
-    const fetchProdString = createURL(minPrice, maxPrice, brands, search);
+function ratingsOnOpen() {
+    // this is weird, it seems to get them in reverse order?
+    ratingWrappers = document.querySelectorAll('.rating-radio-wrapper');
+    generateRating(0, 'red', ratingWrappers[5]);
+    generateRating(1, 'red', ratingWrappers[4]);
+    generateRating(2, 'red', ratingWrappers[3]);
+    generateRating(3, 'yellow', ratingWrappers[2]);
+    generateRating(4, 'green', ratingWrappers[1]);
+    generateRating(5, 'green', ratingWrappers[0]);
+}
+
+function generateRating(filledStars, filledColor = 'red', wrapper) {
+    const totalStars = 5;
+    for (let i = 0; i < totalStars; i++) {
+        const ratingDiv = document.createElement('span');
+        ratingDiv.classList.add(i < filledStars ? 'filled-rating' : 'empty-rating');
+        if (i < filledStars) {
+            ratingDiv.classList.add(filledColor);
+        }
+
+        wrapper.appendChild(ratingDiv);
+    }
+    const plus = document.createElement('span');
+    plus.textContent="+";
+    wrapper.appendChild(plus);
+  }
+
+function fetchProducts(minPrice, maxPrice, brands, search, rating) {
+    const fetchProdString = createURL(minPrice, maxPrice, brands, search, rating);
     fetch(fetchProdString)
     .then(response => {
+        if (response.status === 204) {
+            // No Content Response
+            return []
+        }
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -80,7 +126,6 @@ function fetchProducts(minPrice, maxPrice, brands, search) {
     })
     .then(products => {
         createProducts(products)
-
         attachEventListeners();
     })
     .catch(error => console.error('Error fetching items: ', error));
@@ -89,6 +134,14 @@ function fetchProducts(minPrice, maxPrice, brands, search) {
 function createProducts(products) {
     const listOfItemsDoc = document.getElementById('items')
     listOfItemsDoc.innerHTML = ''; // clears items
+
+    if (products.length === 0) {
+        const noProductsMessage = document.createElement('div');
+        noProductsMessage.textContent = 'No products found.';
+        noProductsMessage.classList.add('no-products-message');
+        listOfItemsDoc.appendChild(noProductsMessage);
+        return;
+    }    
 
     products.forEach(element => {
     // Building the item html
@@ -205,32 +258,39 @@ function fetchBrands() {
     }).then(brands => {
         const checklistWrapper = document.querySelector(".checkbox-wrapper");
         brands.forEach(brand => {
-            createBrandChecklist(brand, checklistWrapper);
+            brandsList.push(brand);
         });
+        brands.sort((a, b) => b.count - a.count);
+        createBrandChecklist(brands, checklistWrapper);
     }).catch(error => console.error('Error fetching brands: ', error));
 }
 
-function createBrandChecklist(brand, checklistWrapper) {
-    brandName = brand.productBrand;
-    brandCount = brand.count;
+function createBrandChecklist(brandList, checklistWrapper) {
+    let count = 0;
+    while (count <= 10) {
+        b = brandList[count];
+        brandName = b.productBrand;
+        brandCount = b.count;
 
-    if (brandName === "") {
-        brandName = "Others"; // find a way to put this at the bottom
+        if (brandName === "") {
+            brandName = "Others"; // find a way to put this at the bottom
+        }
+        inputElement = document.createElement('input');
+        inputElement.type = "checkbox";
+        inputElement.id =`${brandName}Checkbox`;
+        inputElement.value = `${brandName}`;
+        inputElement.name = "brand";
+
+        labelElement = document.createElement('label');
+        labelElement.htmlFor = `${brandName}Checkbox`;
+        labelElement.textContent = `${brandName} (${brandCount})`;
+
+        checklistWrapper.appendChild(inputElement);
+        checklistWrapper.appendChild(labelElement);
+        checklistWrapper.appendChild(document.createElement('br'));
+        
+        count += 1;
     }
-
-    inputElement = document.createElement('input');
-    inputElement.type = "checkbox";
-    inputElement.id =`${brandName}Checkbox`;
-    inputElement.value = `${brandName}`;
-    inputElement.name = "brand";
-
-    labelElement = document.createElement('label');
-    labelElement.htmlFor = `${brandName}Checkbox`;
-    labelElement.textContent = `${brandName} (${brandCount})`;
-
-    checklistWrapper.appendChild(inputElement);
-    checklistWrapper.appendChild(labelElement);
-    checklistWrapper.appendChild(document.createElement('br'));
 }
 
 function attachEventListeners() {

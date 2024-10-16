@@ -58,7 +58,6 @@ section {
     position: relative;
     text-align: center;
     width: 100vw;
-    height: 10vh;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -68,6 +67,20 @@ section {
 
 .item-section-title span {
     font-size: 56px;
+}
+
+.search-input {
+    width: 25rem;
+    height: 2rem;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    font-weight: bold;
+    box-sizing: border-box;
+    color: var(--subtle-text);
+}
+
+.search-input ::placeholder {
+    font-style: italic;
 }
 
 .sidebar-and-item-container {
@@ -90,9 +103,9 @@ section {
     margin-right: 24px;
     padding-right: 8px;
     width: 220px;
-    overflow-y: scroll;
-    scrollbar-color: transparent transparent;
+    overflow-y: auto;
     scrollbar-width: thin;
+    max-height: 100%;
 }
 
 .filter-wrapper {
@@ -100,6 +113,20 @@ section {
     flex-direction: column;
     gap: 2rem;
     box-sizing: border-box;
+}
+
+.filter-wrapper button {
+    width: 100%;
+    height: 2.5rem;
+    border: solid 0.1rem var(--accent-color);
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--dark-text);
+}
+
+.filter-wrapper button:hover {
+    background-color: var(--accent-color);
 }
 
 .filter-header {
@@ -112,20 +139,6 @@ section {
     font-weight: bold;
     font-size: 1.0rem;
     color: var(--dark-text);
-}
-
-.filter-price button {
-    width: 100%;
-    height: 2.5rem;
-    border: solid 0.1rem var(--accent-color);
-    background-color: var(--primary-color);
-    border-radius: 8px;
-    font-size: 1rem;
-    color: var(--dark-text);
-}
-
-.filter-price button:hover {
-    background-color: var(--accent-color);
 }
 
 .filter-price {
@@ -150,6 +163,49 @@ section {
     border: solid 0.1rem #e2eee7;
 }
 
+.ratings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rating-radio-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    font-size: 1.5rem;
+    align-items: center;
+}
+
+.empty-rating {
+    border: 0.1rem solid gray;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 100%;
+}
+
+.filled-rating {
+    border: 0.1rem solid gray;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 100%;
+}
+
+.red {
+    background-color: red;
+}
+
+.yellow {
+    background-color: yellow;
+}
+
+.green {
+    background-color: green;
+}
+
+.filler {
+    height: 25rem;
+}
 /* Item Container */
 .item-container {
     justify-content: center;
@@ -160,6 +216,14 @@ section {
     flex-shrink: 1;
     min-width: 0;
     justify-content: flex-start;
+}
+
+.no-products-message {
+    position:absolute;
+    top: 25%;
+    left: 50%;
+    margin-top: 20px;
+    font-size: xx-large;
 }
 
 .item {
@@ -174,6 +238,8 @@ section {
     cursor: pointer;
     border-radius: 5px;
     color: var(--dark-text);
+
+    max-height: 28rem; /* this can change */
 }
 
 .product-name {
@@ -228,7 +294,7 @@ section {
 }
 
 .item.active {
-    width: 80vw;
+    width: 66vw;
     height: 62vh;
     cursor: auto;
     flex: none;

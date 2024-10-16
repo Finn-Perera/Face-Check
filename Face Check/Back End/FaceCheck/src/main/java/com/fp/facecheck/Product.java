@@ -15,6 +15,7 @@ public class Product {
     private String productImage;
     private Double lowestCost;
     private String productBrand;
+    private Double overallRating;
     @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductOption> options;
@@ -22,12 +23,13 @@ public class Product {
     public Product() {
     }
 
-    public Product(int productId, String productName, String productImage, double lowestCost, String productBrand) {
+    public Product(int productId, String productName, String productImage, double lowestCost, String productBrand, double overallRating) {
         this.productId = productId;
         this.productName = productName;
         this.productImage = productImage;
         this.lowestCost = lowestCost;
         this.productBrand = productBrand;
+        this.overallRating = overallRating;
     }
 
     @Override
@@ -38,6 +40,7 @@ public class Product {
                 ", productImage='" + productImage + '\'' +
                 ", lowestCost=" + lowestCost +
                 ", productBrand='" + productBrand + '\'' +
+                ", overallRating=" + overallRating +
                 ", options=" + options +
                 '}';
     }
@@ -84,5 +87,13 @@ public class Product {
 
     public void setProductBrand(String productBrand) {
         this.productBrand = productBrand;
+    }
+
+    public Double getOverallRating() {
+        return overallRating;
+    }
+
+    public void setOverallRating(Double overallRating) {
+        this.overallRating = overallRating;
     }
 }
