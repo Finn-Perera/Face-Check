@@ -1,9 +1,7 @@
 package com.fp.facecheck;
 
 import com.fp.facecheck.dtos.BrandCountDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 public class FaceCheckResource {
-    private static final Logger logger = LoggerFactory.getLogger(FaceCheckResource.class);
+    
     private final ProductRepository prodRepo;
     private final ProductServices productServices;
 
