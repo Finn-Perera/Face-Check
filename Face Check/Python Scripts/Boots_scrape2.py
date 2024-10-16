@@ -40,10 +40,8 @@ def gather_items():
     driver.get(url)
     items = []
     try:
-        print("here")
         time.sleep(2)
         load_all_content(driver, (By.CSS_SELECTOR, '[aria-label="view 24 more products"]'))
-        print("here2")
         div = driver.find_element(By.CSS_SELECTOR, 'div[data-insights-index="prod_live_products_uk"]')
         print("Div found:")
         
@@ -64,20 +62,21 @@ def gather_items():
             hrefs = []
 
             driver.execute_script("arguments[0].scrollIntoView(true);", element)
-
             # For price:
             price = element.find_element(By.CSS_SELECTOR, '.oct-teaser__productPrice').text
 
             # For Reviews:
-            review_elem = element.find_element(By.CSS_SELECTOR, '.oct-reviews__count')
-            parts = review_elem.get_attribute("aria-label").split()
-            if "stars" in parts and "reviews" in parts:
-                stars_index = parts.index("stars") - 1
-                stars = parts[stars_index] if stars_index >= 0 else None
-                reviews_index = parts.index("reviews") - 1
-                reviewNum = parts[reviews_index] if reviews_index >= 0 else None
-
-            
+            try:
+                review_elem = element.find_element(By.CSS_SELECTOR, '.oct-reviews__count')
+                parts = review_elem.get_attribute("aria-label").split()
+                if "stars" in parts and "reviews" in parts:
+                    stars_index = parts.index("stars") - 1
+                    stars = parts[stars_index] if stars_index >= 0 else None
+                    reviews_index = parts.index("reviews") - 1
+                    reviewNum = parts[reviews_index] if reviews_index >= 0 else None
+            except Exception as e:
+                print("No review for item")
+                    
             paragraphs_and_links = element.find_elements(By.XPATH, './/p | .//a | .//h3 |.//img')
             for component in paragraphs_and_links:
                 #print(f"\nTag: {component.tag_name}")
