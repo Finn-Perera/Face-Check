@@ -1,4 +1,5 @@
-<h1> Face Check </h1>
+<h1>Face Check</h1>
+<h4>Project Started: 12/08/2024</h4>
 
   **Face Check** is a web application aimed at comparing the prices of skincare products across different websites,
   finding the best prices for any given item. **It is a personal project and does not intend to make any monetary gain.**
