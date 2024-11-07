@@ -42,11 +42,10 @@ function gatherChecked() {
 
 function gatherRadioChecked() {
     const checked = document.querySelector('input[name="radio-rating"]:checked');
-    value = parseFloat(checked.value);
     if (checked === undefined || checked === null) {
         return null;
     }
-
+    value = parseFloat(checked.value);
     return value;
 }
 

@@ -178,14 +178,14 @@ section {
 }
 
 .empty-rating {
-    border: 0.1rem solid gray;
+    border: 0.1rem solid var(--subtle-text);
     width: 1rem;
     height: 1rem;
     border-radius: 100%;
 }
 
 .filled-rating {
-    border: 0.1rem solid gray;
+    border: 0.1rem solid var(--subtle-text);
     width: 1rem;
     height: 1rem;
     border-radius: 100%;
@@ -204,7 +204,7 @@ section {
 }
 
 .filler {
-    height: 25rem;
+    height: 8rem;
 }
 /* Item Container */
 .item-container {
@@ -232,9 +232,9 @@ section {
     flex-direction: row;
     width: 250px;
     gap: 5px;
-    border: 0px, solid, #ddd;
+    border: 2px, solid, whitesmoke;
     padding: 15px;
-    background-color: var(--secondary-color);
+    background-color: var(--primary-color);
     cursor: pointer;
     border-radius: 5px;
     color: var(--dark-text);
@@ -284,8 +284,8 @@ section {
 }
 
 .item:hover {
-    background-color: var(--primary-color);
-    border: 2px solid var(--secondary-color);
+    background-color: var(--secondary-color);
+    border: 2px solid var(--primary-color);
 }
 
 .item.active:hover {
