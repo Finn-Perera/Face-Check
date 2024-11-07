@@ -4,14 +4,11 @@ from mysql.connector import Error
 import os
 import Boots_scrape2
 import The_Ordinary_scrape
+import cosmetify_scrape
 
 load_dotenv()
 
 connection = None
-# host = os.getenv('DB_HOST')
-# user = os.getenv('DB_USER')
-# password = os.getenv('DB_PASSWORD')
-# database = os.getenv('DB_NAME')
 
 def connector():
     return mysql.connector.connect(
@@ -206,4 +203,5 @@ def getBrand(product_name):
 
 #read()
 #writeItemsToDB(Boots_scrape2.gather_items())
-writeItemsToDB(The_Ordinary_scrape.gather_items())
+#writeItemsToDB(The_Ordinary_scrape.gather_items())
+writeItemsToDB(cosmetify_scrape.gather_items())
