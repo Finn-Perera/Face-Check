@@ -99,7 +99,11 @@ def gather_items():
             
             price = price[1:] # strip £
             link = hrefs[0]
-            name = name.strip()
+            split_name = name.split()
+            filtered_name = [word for word in split_name if not word.endswith("ml")] # Removes size in ml
+
+            name = " ".join(filtered_name).strip()
+
             # ['No7 Future Renew Day Cream SPF40 50ml', '(1165)', '£34.95', '50ML | £69.90 per 100ML', '', '', '', '']
             # ['No7 HydraLuminous+ Day Gel 50ml', '(57)', '£14.36', 'Save £3.59', 'Was £17.95', '50ML | £28.72 per 100ML', '', '', '', '']
             # Can also use text here to find discounts and price per unit?
