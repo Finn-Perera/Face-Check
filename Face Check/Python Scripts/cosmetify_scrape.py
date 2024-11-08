@@ -17,7 +17,7 @@ def gather_items():
     count = 1
     items = []
     try:
-        while (count <= 8):
+        while (count <= 5):
             url = f"https://www.cosmetify.com/skin-care/?page_no={count}" 
             driver.get(url)
             time.sleep(2)
@@ -72,14 +72,14 @@ def scrape_items(driver, items):
                 reviewNum = int(reviews_text[0])
             star_elem = element.find_element(By.CSS_SELECTOR, '.stars>.starRating>span')
             star_elem_style = star_elem.get_attribute("style").split()[1].split('%')[0]
-            stars = float(star_elem_style) / 100 * 5
+            stars = round(float(star_elem_style) / 100 * 5, 2)
 
             # Get href
             href_element = element.find_element(By.CSS_SELECTOR, 'a')
-            href = "https://www.cosmetify.com" + href_element.get_attribute('href')
+            href = href_element.get_attribute('href')
 
             image_element = element.find_element(By.CSS_SELECTOR, 'img')
-            image = "https://www.cosmetify.com" + image_element.get_attribute('src')
+            image = image_element.get_attribute('src')
 
             name = f"{brand} {name}" # can't find size? {size}
             
