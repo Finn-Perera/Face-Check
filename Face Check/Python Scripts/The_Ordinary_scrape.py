@@ -57,46 +57,70 @@ def gather_items():
         price = 0
         href = ""
         image = ""
+        id_set = set()
+        count = 0
 
         print("All children found")
 
         for element in all_children:
-            driver.execute_script("arguments[0].scrollIntoView(true);", element)
-            # Get Name and Price data
-            price_element = element.find_element(By.CSS_SELECTOR, 'span[class="value"]')
-            price = float(price_element.get_attribute("content"))
+            try:
+                count += 1
+                driver.execute_script("arguments[0].scrollIntoView(true);", element)
+                # Get Name and Price data
+                detail_element = element.find_element(By.CSS_SELECTOR, '.product-detail')
+                if detail_element.get_attribute('data-available') != 'true' or detail_element.get_attribute('data-gtm-enhanced-ecommerce') == "null":
+                    continue
+                
+                item_data = json.loads(detail_element.get_attribute('data-gtm-enhanced-ecommerce'))      
+                
+                id = str(item_data["id"])
+                
+                if id in id_set:
+                    print("Already retrieved item")
+                    continue
+                else:
+                    id_set.add(id)
 
-            name_element = element.find_element(By.CSS_SELECTOR, 'a.link.product-link')
-            name = name_element.text
+                name = item_data["name"]
+                brand = item_data["brand"]
+                price = float(item_data["price"])
+                size = item_data["variant"]
+                
+                
 
-            # Get size
-            size_element = element.find_elements(By.CSS_SELECTOR, 'span.size-value')[0]
-            size = size_element.text
-            
-            # Get rating Data
-            review_elem = element.find_element(By.CSS_SELECTOR, 'a.bv_main_container.bv_hover.bv_inline_rating_container_left')
-            label = review_elem.get_attribute('aria-label')
-            label = label.split()
-            stars = float(label[0])
-            reviewNum = int(label[-2])
+                # Get size
+                #size_element = element.find_elements(By.CSS_SELECTOR, 'span.size-value')[0]
+                #size = size_element.text
+                
+                # Get rating Data
+                review_elem = element.find_element(By.CSS_SELECTOR, 'a.bv_main_container.bv_hover.bv_inline_rating_container_left')
+                label = review_elem.get_attribute('aria-label')
+                label = label.split()
+                stars = float(label[0])
+                reviewNum = int(label[-2])
 
-            # Get href
-            href_element = element.find_element(By.CSS_SELECTOR, 'a.bv_main_container')
-            href = href_element.get_attribute('href')
+                #Get href
+                href_element = element.find_element(By.CSS_SELECTOR, 'a.bv_main_container') 
+                href = href_element.get_attribute('href')
 
-            image_element = element.find_element(By.CSS_SELECTOR, 'source[media="(min-width: 1024px)"]')
-            srcset = image_element.get_attribute('data-srcset')
-            image_split = srcset.split()
-            image = image_split[0]
-            name.strip()
-            size.strip()
-            name = f"The Ordinary {name} {size}" # this might change
-            
-            items.append((name, price, stars, reviewNum, href, "The Ordinary", image))
-            #items.append((name, price, stars, reviewNum, link, "Boots", image_data))
+                image_element = element.find_element(By.CSS_SELECTOR, 'source[media="(min-width: 1024px)"]')
+                srcset = image_element.get_attribute('data-srcset')
+                image_split = srcset.split()
+                image = image_split[0]
+                name.strip()
+                size.strip()
+                name = f"{brand} {name}" # {size}
+                
+                items.append((name, price, stars, reviewNum, href, "The Ordinary", image))
+            except Exception as e:
+                print("An error occured:", e)
+                print("At element: ", count)
+                soup = BeautifulSoup(element.get_attribute('outerHTML'), 'html.parser')
+                print(soup.prettify())
+                continue
     except Exception as e:
         print("An error occurred:", e)
-
+    
     # Close the WebDriver
     driver.quit()
     if items == []:
