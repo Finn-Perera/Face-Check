@@ -5,6 +5,32 @@
   finding the best prices for any given item. **It is a personal project and does not intend to make any monetary gain.**
   It is yet to be hosted, although I would like to host it in the future.
 
+<h4>Features</h4>
+
+**Searching by brand**
+
+<details>
+  <summary>Watch Video</summary>
+  
+  [Searching By Brand](https://github.com/user-attachments/assets/2687909a-1106-4e10-a373-c12d53691c1a)
+</details>
+
+**Searching by rating and min/max prices**
+
+<details>
+  <summary>Watch Video</summary>
+ 
+ [Searching By Rating & Price](https://github.com/user-attachments/assets/13ed6127-f7f5-4732-8827-5ab6d83c6e69)
+</details>
+
+**Search bar**
+
+<details>
+  <summary>Watch Video</summary>
+
+ [Search Bar](https://github.com/user-attachments/assets/07e299d4-55a4-4415-b1f8-2b7f02f3808f)
+ </details>
+
 <h3> Motivation </h3>
   I began the project understanding that over many web stores, some will have differing prices on their products.
   As such there are ways for people to benefit from having a centralised location to find all of those prices for their
